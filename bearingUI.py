@@ -132,8 +132,8 @@ probability_threshold = st.slider("Set Probability Threshold (%)", min_value=0, 
 if st.button("Predict for Manual Input"):
     manual_input = np.array([[rms, ku, cf, impulse, pp, energy]])
     scaled_input = scaler.transform(manual_input)
-    probabilities = rf_model.predict_proba(scaled_input)[0] * 100
-    predicted_class = rf_model.predict(scaled_input)[0]
+    probabilities = optimized_lgbm.predict_proba(scaled_input)[0] * 100
+    predicted_class = optimized_lgbm.predict(scaled_input)[0]
     class_name = label_encoder.inverse_transform([predicted_class])[0]
     explanations = {
         "HB": "Healthy Bearing: Normal operation.",
@@ -153,8 +153,8 @@ if uploaded_file is not None:
     try:
         features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN']]
         scaled_features = scaler.transform(features)
-        predictions = rf_model.predict(scaled_features)
-        probabilities = rf_model.predict_proba(scaled_features) * 100
+        predictions = optimized_lgbm.predict(scaled_features)
+        probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
         data['Prediction'] = label_encoder.inverse_transform(predictions)
         data['Probability (%)'] = probabilities.max(axis=1)
         st.write("### Prediction Results")
