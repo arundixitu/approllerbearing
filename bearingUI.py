@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 import matplotlib.pyplot as plt
 
 # Load required files
-rf_model = joblib.load("optimized_lgbm.pkl")
+optimized_lgbm = joblib.load('optimized_lgbm.pkl')
 label_encoder = joblib.load("label_encoder.pkl")
 scaler = joblib.load("scaler.pkl")
 
