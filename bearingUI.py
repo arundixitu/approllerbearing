@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 import matplotlib.pyplot as plt
 
 # Load required files
-rf_model = joblib.load("random_forest_model.pkl")
+rf_model = joblib.load("optimized_lgbm.pkl")
 label_encoder = joblib.load("label_encoder.pkl")
 scaler = joblib.load("scaler.pkl")
 
@@ -90,8 +90,8 @@ st.sidebar.markdown("""
 - **RED (Rolling Element Defect):** Fault detected in the rolling elements of the bearing.
 """)
 
-st.sidebar.markdown("**Machine Learning Model Used:** Random Forest Classifier")
-st.sidebar.markdown("**Accuracy Achieved:** 87%")
+st.sidebar.markdown("**Machine Learning Model Used:** Light Boost Gradient Model (BGM) ")
+st.sidebar.markdown("**Accuracy Achieved:** 90%")
 
 # Add Links to the Model Trained in Google Colab
 st.sidebar.markdown("### Google Colab ML Model Link")
@@ -102,7 +102,7 @@ st.sidebar.markdown("[Confusion Matrix from trained model](https://drive.google.
 
 
 # Main Layout
-st.write("This application detects faults in bearing systems using a Random Forest model trained on vibration dataset features. Upload a dataset or enter values manually to predict the bearing condition.")
+st.write("This application detects faults in bearing systems using a Light Boost Gradient Model (LightBGM) trained on vibration dataset features. Upload a dataset or enter values manually to predict the bearing condition.")
 
 # File Upload Section
 st.markdown("""<h4>Upload Your Vibration Dataset (CSV format):</h4>""", unsafe_allow_html=True)
