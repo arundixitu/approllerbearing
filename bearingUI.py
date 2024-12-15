@@ -170,12 +170,12 @@ if st.button("Predict for Manual Input"):
 # File Processing Section
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
-    try:
+try:
     # Check if Energy/Peak exists; if not, compute it
-        if 'Energy/Peak' not in data.columns:
-            st.warning("'Energy/Peak' not found in uploaded file. Computing it automatically.")
-            data['Energy/Peak'] = data['EN'] / data['PP'].replace(0, np.nan)  # Avoid division by zero
-            data['Energy/Peak'].fillna(0, inplace=True)  # Replace NaN values with 0 if PP was zero
+    if 'Energy/Peak' not in data.columns:
+        st.warning("'Energy/Peak' not found in uploaded file. Computing it automatically.")
+        data['Energy/Peak'] = data['EN'] / data['PP'].replace(0, np.nan)  # Avoid division by zero
+        data['Energy/Peak'].fillna(0, inplace=True)  # Replace NaN values with 0 if PP was zero
 
     # Select features for prediction (ensure correct feature order)
     features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN', 'Energy/Peak']]
@@ -183,18 +183,28 @@ if uploaded_file is not None:
     # Scale the features
     scaled_features = scaler.transform(features)
 
-        predictions = optimized_lgbm.predict(scaled_features)
-        probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
-        data['Prediction'] = label_encoder.inverse_transform(predictions)
-        data['Probability (%)'] = probabilities.max(axis=1)
-        st.write("### Prediction Results")
-        st.dataframe(data)
-        st.download_button("Download Results", data.to_csv(index=False), file_name="results.csv", mime="text/csv")
+    # Make predictions
+    predictions = optimized_lgbm.predict(scaled_features)
+    probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
 
-        visualize_class_distribution(data)
-        visualize_feature_importance()
-    except Exception as e:
-        st.error(f"Error processing file: {e}")
+    # Add predictions and probabilities to the uploaded dataset
+    data['Prediction'] = label_encoder.inverse_transform(predictions)
+    data['Probability (%)'] = probabilities.max(axis=1)
+
+    # Display results
+    st.write("### Prediction Results")
+    st.dataframe(data)
+    st.download_button("Download Results", data.to_csv(index=False), file_name="results.csv", mime="text/csv")
+
+    # Visualizations
+    visualize_class_distribution(data)
+    visualize_feature_importance()
+
+except Exception as e:
+    # Handle errors gracefully
+    st.error(f"Error processing file: {e}")
+
+    
 
 # Footer Section
 st.markdown("""<hr style='border: 1px solid gray;'>""", unsafe_allow_html=True)
