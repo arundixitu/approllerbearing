@@ -36,13 +36,24 @@ def visualize_class_distribution(data):
 
 def visualize_feature_importance():
     st.subheader("Feature Importance")
+
+    # Extract feature importance from the trained LightGBM model
     feature_importance = optimized_lgbm.feature_importances_
-    feature_names = ['RMS', 'KU', 'CF', 'IF', 'PP', 'EN']
+
+    # Ensure the number of feature names matches the model
+    feature_names = ['RMS', 'KU', 'CF', 'IF', 'PP', 'EN', 'Energy/Peak']
+
+    if len(feature_importance) != len(feature_names):
+        st.error("Mismatch between feature importance values and feature names.")
+        return
+
+    # Plot the feature importance
     plt.figure(figsize=(8, 6))
     plt.barh(feature_names, feature_importance, color='teal')
     plt.xlabel("Importance")
-    plt.title("Feature Importance in Random Forest Model")
+    plt.title("Feature Importance in LightGBM Model")
     st.pyplot(plt)
+
 
 # Streamlit App Layout
 st.set_page_config(page_title="Bearing Fault Detection", layout="wide")
@@ -202,9 +213,7 @@ try:
 
 except Exception as e:
     # Handle errors gracefully
-    st.error(f"Error processing file: {e}")
-
-    
+    st.error(f"Error processing file: {e}")  
 
 # Footer Section
 st.markdown("""<hr style='border: 1px solid gray;'>""", unsafe_allow_html=True)
