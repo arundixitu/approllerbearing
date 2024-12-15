@@ -149,7 +149,8 @@ with col6:
 probability_threshold = st.slider("Set Probability Threshold (%)", min_value=0, max_value=100, value=50, step=1)
 
 if st.button("Predict for Manual Input"):
-    manual_input = np.array([[rms, ku, cf, impulse, pp, energy]])
+    energy_peak = energy / pp if pp != 0 else 0.0 
+    manual_input = np.array([[rms, ku, cf, impulse, pp, energy, energy_peak]])
     scaled_input = scaler.transform(manual_input)
     probabilities = optimized_lgbm.predict_proba(scaled_input)[0] * 100
     predicted_class = optimized_lgbm.predict(scaled_input)[0]
