@@ -3,7 +3,10 @@ import sys
 
 # Function to install a package
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    except Exception as e:
+        print(f"Error installing {package}: {e}")
 
 # Try importing the lightgbm library, and install it if not found
 try:
@@ -11,7 +14,7 @@ try:
 except ModuleNotFoundError:
     print("lightgbm not found. Installing...")
     install("lightgbm")
-    import lightgbm as lgb
+    import lightgbm as lgb  # Retry importing after installation
     
 import streamlit as st
 pip install lightgbm
