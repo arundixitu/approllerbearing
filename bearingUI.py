@@ -189,7 +189,7 @@ if uploaded_file is not None:
         for column in required_columns:
             if column not in data.columns:
                 st.error(f"Missing required column: {column}")
-                return
+                st.stop()
 
         # Check if Energy/Peak exists; compute it if missing
         if 'Energy/Peak' not in data.columns:
