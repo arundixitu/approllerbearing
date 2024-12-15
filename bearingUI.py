@@ -180,40 +180,49 @@ if st.button("Predict for Manual Input"):
 
 # File Processing Section
 if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
-try:
-    # Check if Energy/Peak exists; if not, compute it
-    if 'Energy/Peak' not in data.columns:
-        st.warning("'Energy/Peak' not found in uploaded file. Computing it automatically.")
-        data['Energy/Peak'] = data['EN'] / data['PP'].replace(0, np.nan)  # Avoid division by zero
-        data['Energy/Peak'].fillna(0, inplace=True)  # Replace NaN values with 0 if PP was zero
+    try:
+        # Read the uploaded CSV file
+        data = pd.read_csv(uploaded_file)
 
-    # Select features for prediction (ensure correct feature order)
-    features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN', 'Energy/Peak']]
+        # Ensure required columns exist in the uploaded file
+        required_columns = ['RMS', 'KU', 'CF', 'IF', 'PP', 'EN']
+        for column in required_columns:
+            if column not in data.columns:
+                st.error(f"Missing required column: {column}")
+                return
 
-    # Scale the features
-    scaled_features = scaler.transform(features)
+        # Check if Energy/Peak exists; compute it if missing
+        if 'Energy/Peak' not in data.columns:
+            st.warning("'Energy/Peak' not found in uploaded file. Computing it automatically.")
+            data['Energy/Peak'] = data['EN'] / data['PP'].replace(0, np.nan)  # Avoid division by zero
+            data['Energy/Peak'].fillna(0, inplace=True)  # Replace NaN values with 0
 
-    # Make predictions
-    predictions = optimized_lgbm.predict(scaled_features)
-    probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
+        # Select features for scaling and prediction
+        features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN', 'Energy/Peak']]
+        scaled_features = scaler.transform(features)  # Scale features
 
-    # Add predictions and probabilities to the uploaded dataset
-    data['Prediction'] = label_encoder.inverse_transform(predictions)
-    data['Probability (%)'] = probabilities.max(axis=1)
+        # Make predictions
+        predictions = optimized_lgbm.predict(scaled_features)
+        probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
 
-    # Display results
-    st.write("### Prediction Results")
-    st.dataframe(data)
-    st.download_button("Download Results", data.to_csv(index=False), file_name="results.csv", mime="text/csv")
+        # Add predictions and probabilities to the dataset
+        data['Prediction'] = label_encoder.inverse_transform(predictions)
+        data['Probability (%)'] = probabilities.max(axis=1)
 
-    # Visualizations
-    visualize_class_distribution(data)
-    visualize_feature_importance()
+        # Display results
+        st.write("### Prediction Results")
+        st.dataframe(data)
+        st.download_button("Download Results", data.to_csv(index=False), file_name="results.csv", mime="text/csv")
 
-except Exception as e:
-    # Handle errors gracefully
-    st.error(f"Error processing file: {e}")  
+        # Visualizations
+        visualize_class_distribution(data)
+        visualize_feature_importance()
+
+    except Exception as e:
+        # Catch and handle errors
+        st.error(f"Error processing file: {e}")
+else:
+    st.info("Please upload a valid CSV file to begin.")
 
 # Footer Section
 st.markdown("""<hr style='border: 1px solid gray;'>""", unsafe_allow_html=True)
