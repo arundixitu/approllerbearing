@@ -171,8 +171,18 @@ if st.button("Predict for Manual Input"):
 if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
     try:
-        features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN']]
-        scaled_features = scaler.transform(features)
+        # Check if Energy/Peak exists; if not, compute it
+if 'Energy/Peak' not in data.columns:
+    st.warning("'Energy/Peak' not found in uploaded file. Computing it automatically.")
+    data['Energy/Peak'] = data['EN'] / data['PP'].replace(0, np.nan)  # Avoid division by zero
+    data['Energy/Peak'].fillna(0, inplace=True)  # Replace NaN values with 0 if PP was zero
+
+# Select features for prediction (ensure correct feature order)
+features = data[['RMS', 'KU', 'CF', 'IF', 'PP', 'EN', 'Energy/Peak']]
+
+# Scale the features
+scaled_features = scaler.transform(features)
+
         predictions = optimized_lgbm.predict(scaled_features)
         probabilities = optimized_lgbm.predict_proba(scaled_features) * 100
         data['Prediction'] = label_encoder.inverse_transform(predictions)
