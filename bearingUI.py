@@ -1,4 +1,20 @@
+import subprocess
+import sys
+
+# Function to install a package
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# Try importing the lightgbm library, and install it if not found
+try:
+    import lightgbm as lgb
+except ModuleNotFoundError:
+    print("lightgbm not found. Installing...")
+    install("lightgbm")
+    import lightgbm as lgb
+    
 import streamlit as st
+pip install lightgbm
 import pandas as pd
 import numpy as np
 import joblib
